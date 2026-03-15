@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google 账号 - 登录 · 注册（含邮箱/密码）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+            background-color: #fff;
+            color: #202124;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .desktop-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: #f0f4f9;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+            display: flex;
+            width: 100%;
+            max-width: 1000px;
+            min-height: 600px;
+            overflow: hidden;
+        }
+
+        .left-section {
+            flex: 1;
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-section {
+            flex: 1;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .illustration {
+            text-align: center;
+            color: #5f6368;
+        }
+
+        .illustration svg {
+            width: 244px;
+            height: 244px;
+            margin-bottom: 24px;
+        }
+
+        .illustration-text {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-container {
+                background: white;
+                padding: 0;
+            }
+
+            .main-card {
+                flex-direction: column;
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 450px;
+            }
+
+            .right-section {
+                display: none;
+            }
+
+            .left-section {
+                padding: 24px;
+            }
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 8px;
+            font-family: 'Google Sans', 'Noto Sans', sans-serif;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #5f6368;
+            margin-bottom: 32px;
+        }
+
+        .form-container {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 14px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+            background: transparent;
+        }
+
+        .input-field:focus {
+            border-color: #1a73e8;
+            border-width: 2px;
+            padding: 15px 13px;
+        }
+
+        .input-label {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #5f6368;
+            font-size: 16px;
+            pointer-events: none;
+            transition: all 0.2s;
+            background: white;
+            padding: 0 4px;
+        }
+
+        .input-field:focus + .input-label,
+        .input-field:not(:placeholder-shown) + .input-label {
+            top: 0;
+            font-size: 12px;
+            color: #1a73e8;
+        }
+
+        .btn-primary {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background-color: #1557b0;
+        }
+
+        .btn-text {
+            color: #1a73e8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
+
+        .btn-text:hover {
+            background-color: rgba(66,133,244,0.04);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+        }
+
+        /* 视图切换 */
+        .view-section {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .view-section.active {
+            display: flex;
+        }
+
+        /* 验证码输入框默认隐藏 */
+        #otp-group {
+            display: none;
+        }
+
+        /* 倒计时按钮样式 */
+        .countdown {
+            background-color: #dadce0 !important;
+            cursor: not-allowed;
+        }
+
+        /* 辅助分隔 */
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #5f6368;
+            font-size: 14px;
+            margin: 24px 0;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dadce0;
+        }
+
+        .separator:not(:empty)::before {
+            margin-right: 1em;
+        }
+
+        .separator:not(:empty)::after {
+            margin-left: 1em;
+        }
+
+        .link-action {
+            color: #1a73e8;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop-container">
+        <div class="main-card">
+            <div class="left-section">
+                <!-- ========= 登录视图 (默认显示) ========= -->
+                <div id="login-view" class="view-section active">
+                    <svg class="logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    <h1>登录</h1>
+                    <p class="subtitle">使用您的 Google 账号</p>
+                    <div class="form-container">
+                        <!-- 登录表单：邮箱/电话 + 下一步 (模拟) -->
+                        <div class="input-group">
+                            <input type="text" class="input-field" id="login-email" placeholder=" " value="">
+                            <label class="input-label" for="login-email">电子邮件或手机号码</label>
+                        </div>
+                        <div class="button-group" style="justify-content: flex-end;">
+                            <button class="btn-primary" onclick="handleLogin()">下一步</button>
+                        </div>
+
+                        <div class="separator">或者</div>
+
+                        <!-- 创建账号入口 -->
+                        <div style="text-align: left;">
+                            <button class="btn-text" onclick="switchToRegister()">创建账号</button>
+                        </div>
+
+                        <!-- 提示信息 -->
+                        <div style="margin-top: 32px; font-size: 13px; color: #5f6368;">
+                            登录即表示您同意 Google 的《服务条款》和《隐私政策》。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========= 注册视图 (包含邮箱/密码步骤) ========= -->
+                <div id="register-view" class="view-section">
+                    <svg class="logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    <h1>创建 Google 账号</h1>
+                    <p class="subtitle" id="register-subtitle">输入您的姓名</p>
+                    <div class="form-container">
+                        <!-- 步骤1: 姓名 -->
+                        <div id="step-name">
+                            <div class="input-group">
+                                <input type="text" class="input-field" id="first-name" placeholder=" ">
+                                <label class="input-label" for="first-name">名字</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" class="input-field" id="last-name" placeholder=" ">
+                                <label class="input-label" for="last-name">姓氏</label>
+                            </div>
+                            <div class="button-group">
+                                <button class="btn-text" onclick="backToLogin()">返回</button>
+                                <button class="btn-primary" onclick="showEmailStep()">下一步</button>
+                            </div>
+                        </div>
+
+                        <!-- 步骤2: 邮箱/密码 (新增) -->
+                        <div id="step-email-password" style="display: none;">
+                            <div class="input-group">
+                                <input type="email" class="input-field" id="reg-email" placeholder=" ">
+                                <label class="input-label" for="reg-email">电子邮件</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="password" class="input-field" id="reg-password" placeholder=" ">
+                                <label class="input-label" for="reg-password">密码</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="password" class="input-field" id="reg-confirm" placeholder=" ">
+                                <label class="input-label" for="reg-confirm">确认密码</label>
+                            </div>
+                            <div class="button-group">
+                                <button class="btn-text" onclick="goBackToNameStep()">返回</button>
+                                <button class="btn-primary" onclick="showPhoneStep()">下一步</button>
+                            </div>
+                        </div>
+
+                        <!-- 步骤3: 手机验证 -->
+                        <div id="step-phone" style="display: none;">
+                            <div class="input-group">
+                                <input type="tel" class="input-field" id="phone" placeholder=" ">
+                                <label class="input-label" for="phone">手机号码</label>
+                            </div>
+                            <button class="btn-primary" onclick="sendVerificationCode(event)">发送验证码</button>
+                            
+                            <div id="otp-group" style="margin-top: 24px;">
+                                <div class="input-group">
+                                    <input type="text" class="input-field" id="otp" placeholder=" ">
+                                    <label class="input-label" for="otp">输入验证码</label>
+                                </div>
+                                <div class="button-group">
+                                    <button class="btn-text" onclick="document.getElementById('otp-group').style.display='none';">取消</button>
+                                    <button class="btn-primary" onclick="verifyAndLogin()">验证并注册</button>
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px;">
+                                <button class="btn-text" onclick="goBackToEmailStep()">← 返回修改邮箱/密码</button>
+                            </div>
+                        </div>
+
+                        <!-- 步骤4: 成功页面 -->
+                        <div id="step-success" style="display: none; text-align: center; padding: 40px 0;">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="#34A853" style="margin-bottom: 24px;">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            <h2>注册成功！</h2>
+                            <p style="color: #5f6368; margin-top: 16px;">欢迎使用您的 Google 账号。</p>
+                            <div style="margin-top: 32px;">
+                                <button class="btn-primary" onclick="window.location.reload();">进入主页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧说明 (不变) -->
+            <div class="right-section">
+                <div class="illustration">
+                    <svg viewBox="0 0 24 24" width="244" height="244">
+                        <path fill="#5F6368" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <div class="illustration-text">使用 Google 账号，您可以访问 Gmail、YouTube、Google Play 等所有 Google 服务。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- 视图切换 ----------
+        function switchToRegister() {
+            document.getElementById('login-view').classList.remove('active');
+            document.getElementById('register-view').classList.add('active');
+            // 重置注册视图到姓名步骤
+            resetRegisterToName();
+        }
+
+        function backToLogin() {
+            document.getElementById('register-view').classList.remove('active');
+            document.getElementById('login-view').classList.add('active');
+            resetRegisterToName(); // 清理状态
+        }
+
+        function resetRegisterToName() {
+            document.getElementById('step-name').style.display = 'block';
+            document.getElementById('step-email-password').style.display = 'none';
+            document.getElementById('step-phone').style.display = 'none';
+            document.getElementById('step-success').style.display = 'none';
+            document.getElementById('otp-group').style.display = 'none';
+            document.getElementById('register-subtitle').innerText = '输入您的姓名';
+        }
+
+        // 姓名 -> 邮箱/密码
+        function showEmailStep() {
+            const firstName = document.getElementById('first-name').value.trim();
+            const lastName = document.getElementById('last-name').value.trim();
+            if (!firstName || !lastName) {
+                alert("请输入姓名");
+                return;
+            }
+            document.getElementById('step-name').style.display = 'none';
+            document.getElementById('step-email-password').style.display = 'block';
+            document.getElementById('register-subtitle').innerText = '设置邮箱和密码';
+        }
+
+        // 返回姓名 (从邮箱步骤)
+        function goBackToNameStep() {
+            document.getElementById('step-email-password').style.display = 'none';
+            document.getElementById('step-name').style.display = 'block';
+            document.getElementById('register-subtitle').innerText = '输入您的姓名';
+        }
+
+        // 邮箱/密码 -> 手机
+        function showPhoneStep() {
+            const email = document.getElementById('reg-email').value.trim();
+            const pwd = document.getElementById('reg-password').value.trim();
+            const confirm = document.getElementById('reg-confirm').value.trim();
+
+            if (!email || !pwd || !confirm) {
+                alert("请完整填写邮箱和密码");
+                return;
+            }
+            if (pwd !== confirm) {
+                alert("两次输入的密码不一致");
+                return;
+            }
+            if (pwd.length < 6) {
+                alert("密码至少6个字符");
+                return;
+            }
+
+            document.getElementById('step-email-password').style.display = 'none';
+            document.getElementById('step-phone').style.display = 'block';
+            document.getElementById('register-subtitle').innerText = '验证手机号码';
+        }
+
+        // 返回邮箱步骤 (从手机)
+        function goBackToEmailStep() {
+            document.getElementById('step-phone').style.display = 'none';
+            document.getElementById('step-email-password').style.display = 'block';
+            document.getElementById('register-subtitle').innerText = '设置邮箱和密码';
+            // 隐藏验证码区域，重置发送按钮
+            document.getElementById('otp-group').style.display = 'none';
+            const sendBtn = document.querySelector('#step-phone .btn-primary');
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.classList.remove('countdown');
+                sendBtn.textContent = '发送验证码';
+            }
+        }
+
+        // 模拟发送验证码
+        function sendVerificationCode(event) {
+            const phoneInput = document.getElementById('phone');
+            const otpGroup = document.getElementById('otp-group');
+            const sendBtn = event.target;
+
+            if (!phoneInput.value.trim()) {
+                alert("请输入手机号码");
+                return;
+            }
+
+            otpGroup.style.display = 'block';
+
+            let timeLeft = 60;
+            sendBtn.disabled = true;
+            sendBtn.classList.add('countdown');
+            sendBtn.textContent = `重新发送(${timeLeft}s)`;
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                sendBtn.textContent = `重新发送(${timeLeft}s)`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    sendBtn.disabled = false;
+                    sendBtn.classList.remove('countdown');
+                    sendBtn.textContent = '重新发送验证码';
+                }
+            }, 1000);
+        }
+
+        // 验证验证码并完成注册
+        function verifyAndLogin() {
+            const otpInput = document.getElementById('otp');
+            
+            if (!otpInput.value.trim()) {
+                alert("请输入收到的验证码");
+                return;
+            }
+
+            // 这里可以添加真实的验证逻辑
+            // 演示直接成功
+            document.getElementById('step-phone').style.display = 'none';
+            document.getElementById('step-success').style.display = 'block';
+            document.getElementById('register-subtitle').innerText = '注册成功';
+        }
+
+        // 登录处理 (演示)
+        function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            if (!email) {
+                alert("请输入电子邮件或手机号码");
+                return;
+            }
+            alert("演示模式：登录成功 (模拟)");
+            window.location.reload(); 
+        }
+
+        // 初始化
+        window.onload = function() {
+            document.getElementById('login-view').classList.add('active');
+            document.getElementById('register-view').classList.remove('active');
+            resetRegisterToName();
+        };
+    </script>
+</body>
+</html>
